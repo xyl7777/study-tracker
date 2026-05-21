@@ -31,6 +31,7 @@ function App() {
   const [courseName, setCourseName] = useState('')
   const [minutes, setMinutes] = useState('')
   const [date, setDate] = useState('')
+  const [filterDate, setFilterDate] = useState('')
   const [records, setRecords] = useState(loadStudyRecords)
 
   useEffect(() => {
@@ -71,6 +72,10 @@ function App() {
 
     return summary
   }, [])
+
+  const filteredRecords = filterDate
+    ? records.filter((record) => record.date === filterDate)
+    : records
 
   function handleAddRecord() {
     const trimmedCourseName = courseName.trim()
@@ -171,11 +176,28 @@ function App() {
         <div className="records">
           <h2>Records</h2>
 
-          {records.length === 0 ? (
-            <p className="empty">No study records yet.</p>
+          <div className="record-filter">
+            <label>
+              Filter by Date
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(event) => setFilterDate(event.target.value)}
+              />
+            </label>
+
+            <button type="button" onClick={() => setFilterDate('')}>
+              Clear Filter
+            </button>
+          </div>
+
+          {filteredRecords.length === 0 ? (
+            <p className="empty">
+              {filterDate ? 'No records for this date.' : 'No study records yet.'}
+            </p>
           ) : (
             <ul>
-              {records.map((record) => (
+              {filteredRecords.map((record) => (
                 <li key={record.id}>
                   <div>
                     <strong>{record.courseName}</strong>

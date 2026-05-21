@@ -134,6 +134,23 @@ button:hover {
   padding-top: 20px;
 }
 
+.record-filter {
+  display: grid;
+  grid-template-columns: 180px auto;
+  gap: 12px;
+  align-items: end;
+  justify-content: start;
+  margin-bottom: 16px;
+}
+
+.record-filter button {
+  background: #64748b;
+}
+
+.record-filter button:hover {
+  background: #475569;
+}
+
 .empty {
   margin: 0;
   color: #6b7280;
@@ -186,6 +203,10 @@ li button:hover {
   }
 
   .form {
+    grid-template-columns: 1fr;
+  }
+
+  .record-filter {
     grid-template-columns: 1fr;
   }
 
