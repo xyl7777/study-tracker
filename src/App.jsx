@@ -1,10 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+
+const STORAGE_KEY = 'study-tracker-records'
+
+function loadStudyRecords() {
+  try {
+    const savedRecords = localStorage.getItem(STORAGE_KEY)
+
+    if (!savedRecords) {
+      return []
+    }
+
+    const parsedRecords = JSON.parse(savedRecords)
+
+    if (!Array.isArray(parsedRecords)) {
+      return []
+    }
+
+    return parsedRecords
+  } catch {
+    return []
+  }
+}
 
 function App() {
   const [courseName, setCourseName] = useState('')
   const [minutes, setMinutes] = useState('')
-  const [records, setRecords] = useState([])
+  const [records, setRecords] = useState(loadStudyRecords)
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+    } catch {
+      // If browser storage is unavailable, the app can still work in memory.
+    }
+  }, [records])
 
   const totalMinutes = records.reduce((total, record) => {
     return total + record.minutes
