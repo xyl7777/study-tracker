@@ -29,6 +29,10 @@ function getLastSevenDays() {
   return days
 }
 
+function makeCSVValue(value) {
+  return `"${String(value).replaceAll('"', '""')}"`
+}
+
 function loadStudyRecords() {
   return loadSavedArray(STORAGE_KEY)
 }
@@ -76,7 +80,11 @@ function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+      if (records.length === 0) {
+        localStorage.removeItem(STORAGE_KEY)
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(records))
+      }
     } catch {
       // If browser storage is unavailable, the app can still work in memory.
     }
@@ -84,7 +92,11 @@ function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals))
+      if (goals.length === 0) {
+        localStorage.removeItem(GOALS_STORAGE_KEY)
+      } else {
+        localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals))
+      }
     } catch {
       // If browser storage is unavailable, the app can still work in memory.
     }
@@ -259,6 +271,50 @@ function App() {
     setGoals(nextGoals)
   }
 
+  function handleExportRecordsCSV() {
+    if (records.length === 0) {
+      alert('No records to export.')
+      return
+    }
+
+    const header = ['Course', 'Minutes', 'Date']
+    const rows = records.map((record) => {
+      return [
+        makeCSVValue(record.courseName),
+        makeCSVValue(record.minutes),
+        makeCSVValue(record.date || 'No date'),
+      ].join(',')
+    })
+
+    const csvText = [header.join(','), ...rows].join('\n')
+    const csvFile = new Blob([csvText], { type: 'text/csv' })
+    const downloadUrl = URL.createObjectURL(csvFile)
+    const link = document.createElement('a')
+
+    link.href = downloadUrl
+    link.download = 'study-records.csv'
+    link.click()
+
+    URL.revokeObjectURL(downloadUrl)
+  }
+
+  function handleClearAllData() {
+    const shouldClear = confirm(
+      'This will delete all records and goals. Are you sure?',
+    )
+
+    if (!shouldClear) {
+      return
+    }
+
+    setRecords([])
+    setGoals([])
+    localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(GOALS_STORAGE_KEY)
+    handleCancelEditRecord()
+    handleCancelEditGoal()
+  }
+
   function handleStartEditGoal(goal) {
     setEditingGoalId(goal.id)
     setEditGoalCourseName(goal.courseName)
@@ -320,17 +376,45 @@ function App() {
   return (
     <main className="app">
       <section className="tracker">
-        <h1>Study Tracker</h1>
+        <header className="app-header">
+          <div>
+            <h1>Study Tracker</h1>
+            <p>Track your study time, review progress, and course goals.</p>
+          </div>
+
+          <div className="app-actions">
+            <button type="button" onClick={handleExportRecordsCSV}>
+              Export Records CSV
+            </button>
+            <button
+              type="button"
+              className="danger-button"
+              onClick={handleClearAllData}
+            >
+              Clear All Data
+            </button>
+          </div>
+        </header>
 
         <div className="summary">
+          <div>
+            <span>All Time Study Time</span>
+            <strong>{totalMinutes} minutes</strong>
+          </div>
+
           <div>
             <span>Today Study Time</span>
             <strong>{todayMinutes} minutes</strong>
           </div>
 
           <div>
-            <span>All Time Study Time</span>
-            <strong>{totalMinutes} minutes</strong>
+            <span>Total Records</span>
+            <strong>{records.length}</strong>
+          </div>
+
+          <div>
+            <span>Total Goals</span>
+            <strong>{goals.length}</strong>
           </div>
         </div>
 
