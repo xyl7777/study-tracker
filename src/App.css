@@ -98,6 +98,7 @@ button:hover {
   background: #1d4ed8;
 }
 
+.last-seven-days,
 .course-summary {
   margin-bottom: 28px;
   padding: 18px;
@@ -106,6 +107,7 @@ button:hover {
   background: #fbfdff;
 }
 
+.last-seven-days h2,
 .course-summary h2,
 .records h2 {
   margin: 0 0 12px;
@@ -113,10 +115,12 @@ button:hover {
   font-size: 20px;
 }
 
+.last-seven-days ul,
 .course-summary ul {
   gap: 8px;
 }
 
+.last-seven-days li,
 .course-summary li {
   padding: 10px 0;
   border: 0;
@@ -125,6 +129,7 @@ button:hover {
   background: transparent;
 }
 
+.last-seven-days li:last-child,
 .course-summary li:last-child {
   border-bottom: 0;
 }

@@ -3,8 +3,29 @@ import './App.css'
 
 const STORAGE_KEY = 'study-tracker-records'
 
+function formatDate(date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
 function getTodayDate() {
-  return new Date().toISOString().slice(0, 10)
+  return formatDate(new Date())
+}
+
+function getLastSevenDays() {
+  const today = new Date()
+  const days = []
+
+  for (let index = 0; index < 7; index += 1) {
+    const date = new Date(today)
+    date.setDate(today.getDate() - index)
+    days.push(formatDate(date))
+  }
+
+  return days
 }
 
 function loadStudyRecords() {
@@ -55,6 +76,21 @@ function App() {
 
     return total
   }, 0)
+
+  const lastSevenDaysSummary = getLastSevenDays().map((date) => {
+    const minutes = records.reduce((total, record) => {
+      if (record.date === date) {
+        return total + record.minutes
+      }
+
+      return total
+    }, 0)
+
+    return {
+      date,
+      minutes,
+    }
+  })
 
   const courseSummary = records.reduce((summary, record) => {
     const existingCourse = summary.find((course) => {
@@ -118,6 +154,19 @@ function App() {
             <span>All Time Study Time</span>
             <strong>{totalMinutes} minutes</strong>
           </div>
+        </div>
+
+        <div className="last-seven-days">
+          <h2>Last 7 Days Summary</h2>
+
+          <ul>
+            {lastSevenDaysSummary.map((day) => (
+              <li key={day.date}>
+                <strong>{day.date}</strong>
+                <span>{day.minutes} minutes</span>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="course-summary">
