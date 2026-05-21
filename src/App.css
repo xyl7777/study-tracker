@@ -178,6 +178,62 @@ button:hover {
   background: #dc2626;
 }
 
+.edit-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 150px 160px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.course-goals .edit-form {
+  grid-template-columns: 1fr 180px auto;
+}
+
+.editing {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  box-shadow: inset 4px 0 0 #2563eb;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.records .button-row button,
+.course-goals .button-row button {
+  padding: 8px 12px;
+  background: #2563eb;
+}
+
+.records .button-row button:hover,
+.course-goals .button-row button:hover {
+  background: #1d4ed8;
+}
+
+.records .button-row button:last-child,
+.course-goals .button-row button:last-child {
+  background: #64748b;
+}
+
+.records .button-row button:last-child:hover,
+.course-goals .button-row button:last-child:hover {
+  background: #475569;
+}
+
+.records li:not(.editing) .button-row button:last-child,
+.course-goals li:not(.editing) .button-row button:last-child {
+  background: #ef4444;
+}
+
+.records li:not(.editing) .button-row button:last-child:hover,
+.course-goals li:not(.editing) .button-row button:last-child:hover {
+  background: #dc2626;
+}
+
 .records {
   border-top: 1px solid #e5e7eb;
   padding-top: 20px;
@@ -257,6 +313,15 @@ li button:hover {
 
   .goal-form {
     grid-template-columns: 1fr;
+  }
+
+  .edit-form,
+  .course-goals .edit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .button-row {
+    justify-content: flex-start;
   }
 
   .record-filter {

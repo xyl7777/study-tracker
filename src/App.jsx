@@ -64,6 +64,13 @@ function App() {
   const [filterDate, setFilterDate] = useState('')
   const [goalCourseName, setGoalCourseName] = useState('')
   const [goalMinutes, setGoalMinutes] = useState('')
+  const [editingRecordId, setEditingRecordId] = useState(null)
+  const [editRecordCourseName, setEditRecordCourseName] = useState('')
+  const [editRecordMinutes, setEditRecordMinutes] = useState('')
+  const [editRecordDate, setEditRecordDate] = useState('')
+  const [editingGoalId, setEditingGoalId] = useState(null)
+  const [editGoalCourseName, setEditGoalCourseName] = useState('')
+  const [editGoalMinutes, setEditGoalMinutes] = useState('')
   const [records, setRecords] = useState(loadStudyRecords)
   const [goals, setGoals] = useState(loadStudyGoals)
 
@@ -169,6 +176,45 @@ function App() {
     setRecords(nextRecords)
   }
 
+  function handleStartEditRecord(record) {
+    setEditingRecordId(record.id)
+    setEditRecordCourseName(record.courseName)
+    setEditRecordMinutes(String(record.minutes))
+    setEditRecordDate(record.date || '')
+  }
+
+  function handleCancelEditRecord() {
+    setEditingRecordId(null)
+    setEditRecordCourseName('')
+    setEditRecordMinutes('')
+    setEditRecordDate('')
+  }
+
+  function handleSaveEditRecord(id) {
+    const trimmedCourseName = editRecordCourseName.trim()
+    const studyMinutes = Number(editRecordMinutes)
+
+    if (!trimmedCourseName || !Number.isFinite(studyMinutes) || studyMinutes <= 0) {
+      return
+    }
+
+    const nextRecords = records.map((record) => {
+      if (record.id === id) {
+        return {
+          ...record,
+          courseName: trimmedCourseName,
+          minutes: studyMinutes,
+          date: editRecordDate || getTodayDate(),
+        }
+      }
+
+      return record
+    })
+
+    setRecords(nextRecords)
+    handleCancelEditRecord()
+  }
+
   function handleAddGoal() {
     const trimmedCourseName = goalCourseName.trim()
     const targetMinutes = Number(goalMinutes)
@@ -211,6 +257,64 @@ function App() {
   function handleDeleteGoal(id) {
     const nextGoals = goals.filter((goal) => goal.id !== id)
     setGoals(nextGoals)
+  }
+
+  function handleStartEditGoal(goal) {
+    setEditingGoalId(goal.id)
+    setEditGoalCourseName(goal.courseName)
+    setEditGoalMinutes(String(goal.targetMinutes))
+  }
+
+  function handleCancelEditGoal() {
+    setEditingGoalId(null)
+    setEditGoalCourseName('')
+    setEditGoalMinutes('')
+  }
+
+  function handleSaveEditGoal(id) {
+    const trimmedCourseName = editGoalCourseName.trim()
+    const targetMinutes = Number(editGoalMinutes)
+
+    if (!trimmedCourseName || !Number.isFinite(targetMinutes) || targetMinutes <= 0) {
+      return
+    }
+
+    const duplicateGoal = goals.find((goal) => {
+      return goal.id !== id && goal.courseName === trimmedCourseName
+    })
+
+    if (duplicateGoal) {
+      const nextGoals = goals
+        .filter((goal) => goal.id !== id)
+        .map((goal) => {
+          if (goal.id === duplicateGoal.id) {
+            return {
+              ...goal,
+              targetMinutes,
+            }
+          }
+
+          return goal
+        })
+
+      setGoals(nextGoals)
+    } else {
+      const nextGoals = goals.map((goal) => {
+        if (goal.id === id) {
+          return {
+            ...goal,
+            courseName: trimmedCourseName,
+            targetMinutes,
+          }
+        }
+
+        return goal
+      })
+
+      setGoals(nextGoals)
+    }
+
+    handleCancelEditGoal()
   }
 
   return (
@@ -304,24 +408,76 @@ function App() {
                 const progressBarWidth = Math.min(progress, 100)
 
                 return (
-                  <li key={goal.id}>
-                    <div className="goal-info">
-                      <strong>{goal.courseName}</strong>
-                      <span>
-                        {completedMinutes} / {targetMinutes} minutes
-                      </span>
-                      <span>Progress: {progress}%</span>
-                      <div className="progress-bar">
-                        <div style={{ width: `${progressBarWidth}%` }}></div>
-                      </div>
-                    </div>
+                  <li
+                    key={goal.id}
+                    className={editingGoalId === goal.id ? 'editing' : ''}
+                  >
+                    {editingGoalId === goal.id ? (
+                      <div className="edit-form">
+                        <label>
+                          Course Name
+                          <input
+                            type="text"
+                            value={editGoalCourseName}
+                            onChange={(event) =>
+                              setEditGoalCourseName(event.target.value)
+                            }
+                          />
+                        </label>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteGoal(goal.id)}
-                    >
-                      Delete Goal
-                    </button>
+                        <label>
+                          Target Minutes
+                          <input
+                            type="number"
+                            min="1"
+                            value={editGoalMinutes}
+                            onChange={(event) =>
+                              setEditGoalMinutes(event.target.value)
+                            }
+                          />
+                        </label>
+
+                        <div className="button-row">
+                          <button
+                            type="button"
+                            onClick={() => handleSaveEditGoal(goal.id)}
+                          >
+                            Save
+                          </button>
+                          <button type="button" onClick={handleCancelEditGoal}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="goal-info">
+                          <strong>{goal.courseName}</strong>
+                          <span>
+                            {completedMinutes} / {targetMinutes} minutes
+                          </span>
+                          <span>Progress: {progress}%</span>
+                          <div className="progress-bar">
+                            <div style={{ width: `${progressBarWidth}%` }}></div>
+                          </div>
+                        </div>
+
+                        <div className="button-row">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditGoal(goal)}
+                          >
+                            Edit Goal
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteGoal(goal.id)}
+                          >
+                            Delete Goal
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </li>
                 )
               })}
@@ -390,18 +546,82 @@ function App() {
           ) : (
             <ul>
               {filteredRecords.map((record) => (
-                <li key={record.id}>
-                  <div>
-                    <strong>{record.courseName}</strong>
-                    <span>{record.date || 'No date'}</span>
-                    <span>{record.minutes} minutes</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteRecord(record.id)}
-                  >
-                    {'\u5220\u9664'}
-                  </button>
+                <li
+                  key={record.id}
+                  className={editingRecordId === record.id ? 'editing' : ''}
+                >
+                  {editingRecordId === record.id ? (
+                    <div className="edit-form">
+                      <label>
+                        Course Name
+                        <input
+                          type="text"
+                          value={editRecordCourseName}
+                          onChange={(event) =>
+                            setEditRecordCourseName(event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label>
+                        Study Minutes
+                        <input
+                          type="number"
+                          min="1"
+                          value={editRecordMinutes}
+                          onChange={(event) =>
+                            setEditRecordMinutes(event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label>
+                        Date
+                        <input
+                          type="date"
+                          value={editRecordDate}
+                          onChange={(event) =>
+                            setEditRecordDate(event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <div className="button-row">
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEditRecord(record.id)}
+                        >
+                          Save
+                        </button>
+                        <button type="button" onClick={handleCancelEditRecord}>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div>
+                        <strong>{record.courseName}</strong>
+                        <span>{record.date || 'No date'}</span>
+                        <span>{record.minutes} minutes</span>
+                      </div>
+
+                      <div className="button-row">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditRecord(record)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRecord(record.id)}
+                        >
+                          {'\u5220\u9664'}
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>
