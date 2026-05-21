@@ -93,15 +93,40 @@ button:hover {
   background: #1d4ed8;
 }
 
-.records {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 20px;
+.course-summary {
+  margin-bottom: 28px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fbfdff;
 }
 
+.course-summary h2,
 .records h2 {
   margin: 0 0 12px;
   color: #111827;
   font-size: 20px;
+}
+
+.course-summary ul {
+  gap: 8px;
+}
+
+.course-summary li {
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  border-radius: 0;
+  background: transparent;
+}
+
+.course-summary li:last-child {
+  border-bottom: 0;
+}
+
+.records {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
 }
 
 .empty {

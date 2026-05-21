@@ -40,6 +40,23 @@ function App() {
     return total + record.minutes
   }, 0)
 
+  const courseSummary = records.reduce((summary, record) => {
+    const existingCourse = summary.find((course) => {
+      return course.courseName === record.courseName
+    })
+
+    if (existingCourse) {
+      existingCourse.minutes += record.minutes
+    } else {
+      summary.push({
+        courseName: record.courseName,
+        minutes: record.minutes,
+      })
+    }
+
+    return summary
+  }, [])
+
   function handleAddRecord() {
     const trimmedCourseName = courseName.trim()
     const studyMinutes = Number(minutes)
@@ -72,6 +89,23 @@ function App() {
         <div className="summary">
           <span>Total Study Time</span>
           <strong>{totalMinutes} minutes</strong>
+        </div>
+
+        <div className="course-summary">
+          <h2>Course Summary</h2>
+
+          {courseSummary.length === 0 ? (
+            <p className="empty">No course summary yet.</p>
+          ) : (
+            <ul>
+              {courseSummary.map((course) => (
+                <li key={course.courseName}>
+                  <strong>{course.courseName}</strong>
+                  <span>{course.minutes} minutes</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="form">
