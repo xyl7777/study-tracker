@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 const STORAGE_KEY = 'study-tracker-records'
+const GOALS_STORAGE_KEY = 'study-tracker-goals'
 
 function formatDate(date) {
   const year = date.getFullYear()
@@ -29,20 +30,28 @@ function getLastSevenDays() {
 }
 
 function loadStudyRecords() {
+  return loadSavedArray(STORAGE_KEY)
+}
+
+function loadStudyGoals() {
+  return loadSavedArray(GOALS_STORAGE_KEY)
+}
+
+function loadSavedArray(storageKey) {
   try {
-    const savedRecords = localStorage.getItem(STORAGE_KEY)
+    const savedItems = localStorage.getItem(storageKey)
 
-    if (!savedRecords) {
+    if (!savedItems) {
       return []
     }
 
-    const parsedRecords = JSON.parse(savedRecords)
+    const parsedItems = JSON.parse(savedItems)
 
-    if (!Array.isArray(parsedRecords)) {
+    if (!Array.isArray(parsedItems)) {
       return []
     }
 
-    return parsedRecords
+    return parsedItems
   } catch {
     return []
   }
@@ -53,7 +62,10 @@ function App() {
   const [minutes, setMinutes] = useState('')
   const [date, setDate] = useState('')
   const [filterDate, setFilterDate] = useState('')
+  const [goalCourseName, setGoalCourseName] = useState('')
+  const [goalMinutes, setGoalMinutes] = useState('')
   const [records, setRecords] = useState(loadStudyRecords)
+  const [goals, setGoals] = useState(loadStudyGoals)
 
   useEffect(() => {
     try {
@@ -62,6 +74,14 @@ function App() {
       // If browser storage is unavailable, the app can still work in memory.
     }
   }, [records])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(GOALS_STORAGE_KEY, JSON.stringify(goals))
+    } catch {
+      // If browser storage is unavailable, the app can still work in memory.
+    }
+  }, [goals])
 
   const today = getTodayDate()
 
@@ -113,6 +133,16 @@ function App() {
     ? records.filter((record) => record.date === filterDate)
     : records
 
+  function getCourseMinutes(courseName) {
+    return records.reduce((total, record) => {
+      if (record.courseName === courseName) {
+        return total + record.minutes
+      }
+
+      return total
+    }, 0)
+  }
+
   function handleAddRecord() {
     const trimmedCourseName = courseName.trim()
     const studyMinutes = Number(minutes)
@@ -137,6 +167,50 @@ function App() {
   function handleDeleteRecord(id) {
     const nextRecords = records.filter((record) => record.id !== id)
     setRecords(nextRecords)
+  }
+
+  function handleAddGoal() {
+    const trimmedCourseName = goalCourseName.trim()
+    const targetMinutes = Number(goalMinutes)
+
+    if (!trimmedCourseName || !Number.isFinite(targetMinutes) || targetMinutes <= 0) {
+      return
+    }
+
+    const newGoal = {
+      id: Date.now(),
+      courseName: trimmedCourseName,
+      targetMinutes,
+    }
+
+    const existingGoal = goals.find((goal) => {
+      return goal.courseName === trimmedCourseName
+    })
+
+    if (existingGoal) {
+      const nextGoals = goals.map((goal) => {
+        if (goal.courseName === trimmedCourseName) {
+          return {
+            ...goal,
+            targetMinutes,
+          }
+        }
+
+        return goal
+      })
+
+      setGoals(nextGoals)
+    } else {
+      setGoals([newGoal, ...goals])
+    }
+
+    setGoalCourseName('')
+    setGoalMinutes('')
+  }
+
+  function handleDeleteGoal(id) {
+    const nextGoals = goals.filter((goal) => goal.id !== id)
+    setGoals(nextGoals)
   }
 
   return (
@@ -182,6 +256,75 @@ function App() {
                   <span>{course.minutes} minutes</span>
                 </li>
               ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="course-goals">
+          <h2>Course Goals</h2>
+
+          <div className="goal-form">
+            <label>
+              Course Name
+              <input
+                type="text"
+                value={goalCourseName}
+                placeholder={'\u4f8b\u5982\uff1aPDE'}
+                onChange={(event) => setGoalCourseName(event.target.value)}
+              />
+            </label>
+
+            <label>
+              Target Minutes
+              <input
+                type="number"
+                min="1"
+                value={goalMinutes}
+                placeholder={'\u4f8b\u5982\uff1a600'}
+                onChange={(event) => setGoalMinutes(event.target.value)}
+              />
+            </label>
+
+            <button type="button" onClick={handleAddGoal}>
+              Add Goal
+            </button>
+          </div>
+
+          {goals.length === 0 ? (
+            <p className="empty">No course goals yet.</p>
+          ) : (
+            <ul>
+              {goals.map((goal) => {
+                const completedMinutes = getCourseMinutes(goal.courseName)
+                const targetMinutes = Number(goal.targetMinutes)
+                const progress =
+                  targetMinutes > 0
+                    ? Math.round((completedMinutes / targetMinutes) * 100)
+                    : 0
+                const progressBarWidth = Math.min(progress, 100)
+
+                return (
+                  <li key={goal.id}>
+                    <div className="goal-info">
+                      <strong>{goal.courseName}</strong>
+                      <span>
+                        {completedMinutes} / {targetMinutes} minutes
+                      </span>
+                      <span>Progress: {progress}%</span>
+                      <div className="progress-bar">
+                        <div style={{ width: `${progressBarWidth}%` }}></div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteGoal(goal.id)}
+                    >
+                      Delete Goal
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </div>
