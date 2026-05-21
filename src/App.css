@@ -1,0 +1,167 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: #f4f7fb;
+  color: #1f2937;
+}
+
+.tracker {
+  width: min(100%, 640px);
+  padding: 32px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(31, 41, 55, 0.08);
+}
+
+.tracker h1 {
+  margin: 0 0 20px;
+  color: #111827;
+  font-size: 32px;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #eef6ff;
+}
+
+.summary span {
+  color: #526173;
+}
+
+.summary strong {
+  color: #1264a3;
+  font-size: 22px;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 180px auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #111827;
+  font: inherit;
+  background: #ffffff;
+}
+
+input:focus {
+  border-color: #2563eb;
+  outline: 3px solid #dbeafe;
+}
+
+button {
+  border: 0;
+  border-radius: 6px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  background: #2563eb;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.records {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 20px;
+}
+
+.records h2 {
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 20px;
+}
+
+.empty {
+  margin: 0;
+  color: #6b7280;
+}
+
+ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+li div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+li span {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+li button {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  background: #ef4444;
+}
+
+li button:hover {
+  background: #dc2626;
+}
+
+@media (max-width: 640px) {
+  .tracker {
+    padding: 24px;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .summary,
+  li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
