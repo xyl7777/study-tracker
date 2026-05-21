@@ -26,11 +26,16 @@
 }
 
 .summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 24px;
+}
+
+.summary div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 16px;
   border-radius: 8px;
   background: #eef6ff;
@@ -184,7 +189,10 @@ li button:hover {
     grid-template-columns: 1fr;
   }
 
-  .summary,
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
   li {
     align-items: flex-start;
     flex-direction: column;

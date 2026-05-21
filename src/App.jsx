@@ -41,8 +41,18 @@ function App() {
     }
   }, [records])
 
+  const today = getTodayDate()
+
   const totalMinutes = records.reduce((total, record) => {
     return total + record.minutes
+  }, 0)
+
+  const todayMinutes = records.reduce((total, record) => {
+    if (record.date === today) {
+      return total + record.minutes
+    }
+
+    return total
   }, 0)
 
   const courseSummary = records.reduce((summary, record) => {
@@ -94,8 +104,15 @@ function App() {
         <h1>Study Tracker</h1>
 
         <div className="summary">
-          <span>Total Study Time</span>
-          <strong>{totalMinutes} minutes</strong>
+          <div>
+            <span>Today Study Time</span>
+            <strong>{todayMinutes} minutes</strong>
+          </div>
+
+          <div>
+            <span>All Time Study Time</span>
+            <strong>{totalMinutes} minutes</strong>
+          </div>
         </div>
 
         <div className="course-summary">
