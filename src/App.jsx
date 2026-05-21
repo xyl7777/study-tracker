@@ -3,6 +3,10 @@ import './App.css'
 
 const STORAGE_KEY = 'study-tracker-records'
 
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10)
+}
+
 function loadStudyRecords() {
   try {
     const savedRecords = localStorage.getItem(STORAGE_KEY)
@@ -26,6 +30,7 @@ function loadStudyRecords() {
 function App() {
   const [courseName, setCourseName] = useState('')
   const [minutes, setMinutes] = useState('')
+  const [date, setDate] = useState('')
   const [records, setRecords] = useState(loadStudyRecords)
 
   useEffect(() => {
@@ -69,11 +74,13 @@ function App() {
       id: Date.now(),
       courseName: trimmedCourseName,
       minutes: studyMinutes,
+      date: date || getTodayDate(),
     }
 
     setRecords([newRecord, ...records])
     setCourseName('')
     setMinutes('')
+    setDate('')
   }
 
   function handleDeleteRecord(id) {
@@ -130,6 +137,15 @@ function App() {
             />
           </label>
 
+          <label>
+            Date
+            <input
+              type="date"
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+            />
+          </label>
+
           <button type="button" onClick={handleAddRecord}>
             {'\u6dfb\u52a0\u8bb0\u5f55'}
           </button>
@@ -146,6 +162,7 @@ function App() {
                 <li key={record.id}>
                   <div>
                     <strong>{record.courseName}</strong>
+                    <span>{record.date || 'No date'}</span>
                     <span>{record.minutes} minutes</span>
                   </div>
                   <button
