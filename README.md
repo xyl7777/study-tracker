@@ -4,6 +4,10 @@ Study Tracker is a small React project for recording study time, tracking course
 
 This is my first vibe coding project, completed by me with assistance from Codex.
 
+## Live Demo
+
+https://study-tracker-flame.vercel.app/
+
 ## Features
 
 - Add, edit, and delete study records
